@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -39,9 +35,7 @@ namespace OgreMaze.Core.Tests.Services
             // Assert
             Assert.AreEqual(expectedTileType, result);
         }
-
-
-
+        
         [TestCase("Ogre", true)]
         [TestCase("SinkHole", false)]
         [TestCase("Empty", true)]

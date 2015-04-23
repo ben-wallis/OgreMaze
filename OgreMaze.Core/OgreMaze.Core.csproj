@@ -46,9 +46,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\FileSystemService.cs" />
     <Compile Include="Services\IFileSystemService.cs" />
+    <Compile Include="Services\IMapService.cs" />
     <Compile Include="Services\ITileService.cs" />
+    <Compile Include="Services\MapService.cs" />
     <Compile Include="Services\TileService.cs" />
-    <Compile Include="SwampMap.cs" />
+    <Compile Include="SwampNavigator.cs" />
+    <Compile Include="SwampTile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

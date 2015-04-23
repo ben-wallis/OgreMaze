@@ -48,8 +48,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\TestFileSystemService.cs" />
+    <Compile Include="Services\TestMapService.cs" />
     <Compile Include="Services\TestTileService.cs" />
-    <Compile Include="TestSwampMap.cs" />
+    <Compile Include="TestSwampNavigator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
