@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Runtime.CompilerServices;
 using OgreMaze.Core.Enums;
 using OgreMaze.Core.Services;
 
 namespace OgreMaze.Core
 {
-    internal class SwampNavigator
+    internal class SwampNavigator : ISwampNavigator
     {
         private readonly IMapService _mapService;
         private readonly ITileService _tileService;
@@ -32,20 +32,36 @@ namespace OgreMaze.Core
             _currentTile = _startingTile;
             _openTiles.Add(_startingTile);
             
-            while (_currentTile != _destinationTile)
+            while (!_closedTiles.Contains(_destinationTile))
             {
-                ProcessCurrentTile();
-                UpdateOpenTileCosts();
                 _currentTile = GetLowestCostTileFromOpenTiles();
+                _openTiles.Remove(_currentTile);
+                _closedTiles.Add(_currentTile);
+
+                ConsiderNeighbouringTiles(_currentTile);
+
+                UpdateOpenTileCosts();
             }
-        }
 
-        private void ProcessCurrentTile()
-        {
-            _openTiles.Remove(_currentTile);
-            _closedTiles.Add(_currentTile);
+            _currentTile = _destinationTile;
+            while (_currentTile != _startingTile)
+            {
+                _mapService.Map[_currentTile.Xpos, _currentTile.Ypos].SwampTileType = TileType.Ogre;
+                _currentTile = _currentTile.ParentSwampTile;
+            }
 
-            ConsiderNeighbouringTiles(_currentTile);
+            for (var y = 0; y <= _mapService.Height; y++)
+            {
+                var line = String.Empty;
+
+                for (var x = 0; x <= _mapService.Width; x++)
+                {
+                    line += _tileService.GetCharFromTileType(_mapService.Map[x, y].SwampTileType);
+                }
+                Console.WriteLine(line);
+            }
+
+            Console.ReadLine();
         }
 
         private void UpdateOpenTileCosts()
@@ -53,11 +69,7 @@ namespace OgreMaze.Core
             foreach (var tile in _openTiles)
             {
                 tile.MovementCostFromStartingPoint = tile.ParentSwampTile.MovementCostFromStartingPoint + 10;
-
-                var estimatedHorizontalMovementToDestination = Math.Abs(_destinationTile.Xpos - tile.Xpos);
-                var estimatedVerticalMovementToDestination = Math.Abs(_destinationTile.Ypos - tile.Ypos);
-                tile.EstimatedMovementCostToDestination = (estimatedVerticalMovementToDestination
-                                                          + estimatedHorizontalMovementToDestination) * 10;
+                tile.Cost = tile.MovementCostFromStartingPoint + tile.EstimatedCostToTile(_destinationTile);
             }
         }
 
@@ -71,17 +83,17 @@ namespace OgreMaze.Core
             var x = tile.Xpos;
             var y = tile.Ypos;
 
-            var northTile = y - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x, y - 1])
+            var northTile = y - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x, y - 1]) && !_closedTiles.Contains(_mapService.Map[x, y - 1])
                                 ? _mapService.Map[x, y - 1]
                                 : null;
-            var southTile = y + 1 <= _mapService.Height && _tileService.TilePassable(_mapService.Map[x, y + 1])
+            var southTile = y + 1 <= _mapService.Height && _tileService.TilePassable(_mapService.Map[x, y + 1]) && !_closedTiles.Contains(_mapService.Map[x, y + 1])
                                 ? _mapService.Map[x, y + 1]
                                 : null;
-            var westTile = x - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x - 1, y])
+            var westTile = x - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x - 1, y]) && !_closedTiles.Contains(_mapService.Map[x - 1, y])
                                ? _mapService.Map[x - 1, y]
                                : null;
 
-            var eastTile = x + 1 >= _mapService.Width && _tileService.TilePassable(_mapService.Map[x + 1, y])
+            var eastTile = x + 1 <= _mapService.Width && _tileService.TilePassable(_mapService.Map[x + 1, y]) && !_closedTiles.Contains(_mapService.Map[x + 1, y])
                                ? _mapService.Map[x + 1, y]
                                : null;
 
@@ -105,21 +117,17 @@ namespace OgreMaze.Core
 
         internal void ConsiderTile(SwampTile tile)
         {
-            if (_currentTile == _startingTile)
+            if (!_openTiles.Contains(tile))
             {
-                tile.ParentSwampTile = _currentTile;
                 _openTiles.Add(tile);
+                tile.ParentSwampTile = _currentTile;
             }
             else
             {
-                if (_openTiles.Contains(tile))
+                if (tile.MovementCostFromStartingPoint > (_currentTile.MovementCostFromStartingPoint + 10))
                 {
-                    if (tile.MovementCostFromStartingPoint > _currentTile.MovementCostFromStartingPoint + 10)
-                    {
-                        tile.ParentSwampTile = _currentTile;
-                    }
+                    tile.ParentSwampTile = _currentTile;
                 }
-                _openTiles.Add(tile);
             }
         }
     }

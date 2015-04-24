@@ -51,6 +51,7 @@
     <Compile Include="Services\TestMapService.cs" />
     <Compile Include="Services\TestTileService.cs" />
     <Compile Include="TestSwampNavigator.cs" />
+    <Compile Include="TestSwampTile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

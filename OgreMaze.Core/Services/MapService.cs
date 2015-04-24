@@ -22,18 +22,19 @@ namespace OgreMaze.Core.Services
 
         public void LoadMap(string mapFilePath)
         {
-            var mapContents = _fileSystemService.ReadFileAsIEnumerable(mapFilePath);
+            var mapContents = _fileSystemService.ReadFileAsIEnumerable(mapFilePath).ToList();
 
             var currentLine = 0;
-            var lastLineLength = 0;
             foreach (var line in mapContents)
             {
                 if (Map == null)
                 {
                     Map = new SwampTile[line.Length, mapContents.Count()];
+                    Width = line.Length - 1;
+                    Height = mapContents.Count - 1;
                 }
 
-                if (currentLine > 0 && line.Length != lastLineLength)
+                if (line.Length != Width + 1)
                 {
                     throw new Exception("Unable to use jagged maps");
                 }
@@ -43,8 +44,7 @@ namespace OgreMaze.Core.Services
                     Map[stringPos, currentLine] = new SwampTile(_tileService.GetTileTypeFromChar(line[stringPos]),
                         stringPos, currentLine);
                 }
-                
-                lastLineLength = line.Length;
+
                 currentLine++;
             }
         }

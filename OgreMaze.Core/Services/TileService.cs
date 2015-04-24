@@ -22,6 +22,23 @@ namespace OgreMaze.Core.Services
             }
         }
 
+        public char GetCharFromTileType(TileType tileType)
+        {
+            switch (tileType)
+            {
+                case TileType.Ogre:
+                    return '@';
+                case TileType.Empty:
+                    return '.';
+                case TileType.Gold:
+                    return '$';
+                case TileType.SinkHole:
+                    return 'O';
+                default:
+                    throw new Exception("Invalid Tile Type");
+            }
+        }
+
         public bool TilePassable(SwampTile tile)
         {
             switch (tile.SwampTileType)

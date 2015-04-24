@@ -5,6 +5,7 @@ namespace OgreMaze.Core.Services
     internal interface ITileService
     {
         TileType GetTileTypeFromChar(char inputChar);
+        char GetCharFromTileType(TileType tileType);
         bool TilePassable(SwampTile tile);
     }
 }

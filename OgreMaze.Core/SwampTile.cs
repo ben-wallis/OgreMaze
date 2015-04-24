@@ -1,4 +1,5 @@
-﻿using OgreMaze.Core.Enums;
+﻿using System;
+using OgreMaze.Core.Enums;
 
 namespace OgreMaze.Core
 {
@@ -11,21 +12,21 @@ namespace OgreMaze.Core
             Ypos = yPos;
         }
 
-        public TileType SwampTileType { get; private set; }
+        public TileType SwampTileType { get; set; }
         public int Xpos { get; private set; }
         public int Ypos { get; private set; }
 
         public int MovementCostFromStartingPoint { get; set; } // G
-        public int EstimatedMovementCostToDestination { get; set; } // H
         public SwampTile ParentSwampTile { get; set; }
 
-        public int Cost
+        public int Cost { get; set; }
+
+        public int EstimatedCostToTile(SwampTile tile)
         {
-            get
-            {
-                return MovementCostFromStartingPoint
-                       + EstimatedMovementCostToDestination;
-            }
+            var estimatedHorizontalMovementToDestination = Math.Abs(tile.Xpos - Xpos);
+            var estimatedVerticalMovementToDestination = Math.Abs(tile.Ypos - Ypos);
+            return (estimatedVerticalMovementToDestination
+                    + estimatedHorizontalMovementToDestination)*10;
         }
     }
 }
