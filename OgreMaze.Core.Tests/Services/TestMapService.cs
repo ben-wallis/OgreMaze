@@ -60,7 +60,7 @@ namespace OgreMaze.Core.Tests.Services
             _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
 
             // Act
-            var result = _testUtility.TestMapService.FindStartingTile();
+            var result = _testUtility.TestMapService.FindFirstTileContaining(TileType.Ogre);
 
             // Assert
             Assert.AreEqual(ExpectedXCoordinate, result.Xpos);
@@ -80,7 +80,7 @@ namespace OgreMaze.Core.Tests.Services
             _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
 
             // Act
-            var result = _testUtility.TestMapService.FindStartingTile();
+            var result = _testUtility.TestMapService.FindFirstTileContaining(TileType.Ogre);
 
             // Assert
             Assert.AreEqual(ExpectedXCoordinate, result.Xpos);

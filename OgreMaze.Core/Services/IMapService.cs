@@ -1,4 +1,6 @@
-﻿namespace OgreMaze.Core.Services
+﻿using OgreMaze.Core.Enums;
+
+namespace OgreMaze.Core.Services
 {
     internal interface IMapService
     {
@@ -6,6 +8,7 @@
         int Width { get; }
         int Height { get; }
         void LoadMap(string mapFilePath);
-        SwampTile FindStartingTile();
+
+        SwampTile FindFirstTileContaining(TileType tileType);
     }
 }

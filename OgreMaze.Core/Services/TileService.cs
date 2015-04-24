@@ -22,9 +22,9 @@ namespace OgreMaze.Core.Services
             }
         }
 
-        public bool TilePassable(TileType tileType)
+        public bool TilePassable(SwampTile tile)
         {
-            switch (tileType)
+            switch (tile.SwampTileType)
             {
                 case TileType.Empty:
                     return true;

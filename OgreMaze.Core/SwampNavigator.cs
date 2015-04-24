@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using OgreMaze.Core.Enums;
 using OgreMaze.Core.Services;
 
 namespace OgreMaze.Core
@@ -8,6 +12,7 @@ namespace OgreMaze.Core
         private readonly IMapService _mapService;
         private readonly ITileService _tileService;
         private SwampTile _startingTile;
+        private SwampTile _destinationTile;
         private SwampTile _currentTile;
 
         internal List<SwampTile> _openTiles = new List<SwampTile>();
@@ -22,67 +27,100 @@ namespace OgreMaze.Core
         public void Navigate(string mapFile)
         {
             _mapService.LoadMap(mapFile);
-            _startingTile = _mapService.FindStartingTile();
+            _startingTile = _mapService.FindFirstTileContaining(TileType.Ogre);
+            _destinationTile = _mapService.FindFirstTileContaining(TileType.Gold);
             _currentTile = _startingTile;
-
-            ProcessCurrentTile();
+            _openTiles.Add(_startingTile);
             
+            while (_currentTile != _destinationTile)
+            {
+                ProcessCurrentTile();
+                UpdateOpenTileCosts();
+                _currentTile = GetLowestCostTileFromOpenTiles();
+            }
         }
 
         private void ProcessCurrentTile()
         {
-            FindNeighbouringOpenTiles(_currentTile);
-            if (_openTiles.Contains(_currentTile))
-            {
-                _openTiles.Remove(_currentTile);
-            }
+            _openTiles.Remove(_currentTile);
             _closedTiles.Add(_currentTile);
+
+            ConsiderNeighbouringTiles(_currentTile);
         }
 
         private void UpdateOpenTileCosts()
         {
             foreach (var tile in _openTiles)
             {
-                // TODO: update tile costs
+                tile.MovementCostFromStartingPoint = tile.ParentSwampTile.MovementCostFromStartingPoint + 10;
+
+                var estimatedHorizontalMovementToDestination = Math.Abs(_destinationTile.Xpos - tile.Xpos);
+                var estimatedVerticalMovementToDestination = Math.Abs(_destinationTile.Ypos - tile.Ypos);
+                tile.EstimatedMovementCostToDestination = (estimatedVerticalMovementToDestination
+                                                          + estimatedHorizontalMovementToDestination) * 10;
             }
         }
 
-        internal void FindNeighbouringOpenTiles(SwampTile tile)
+        private SwampTile GetLowestCostTileFromOpenTiles()
+        {
+            return _openTiles.OrderByDescending(p => p.Cost).First();
+        }
+
+        internal void ConsiderNeighbouringTiles(SwampTile tile)
         {
             var x = tile.Xpos;
             var y = tile.Ypos;
 
-            if (y - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x, y - 1].SwampTileType))
+            var northTile = y - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x, y - 1])
+                                ? _mapService.Map[x, y - 1]
+                                : null;
+            var southTile = y + 1 <= _mapService.Height && _tileService.TilePassable(_mapService.Map[x, y + 1])
+                                ? _mapService.Map[x, y + 1]
+                                : null;
+            var westTile = x - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x - 1, y])
+                               ? _mapService.Map[x - 1, y]
+                               : null;
+
+            var eastTile = x + 1 >= _mapService.Width && _tileService.TilePassable(_mapService.Map[x + 1, y])
+                               ? _mapService.Map[x + 1, y]
+                               : null;
+
+            if (northTile != null)
             {
-                AddToOpenTiles(x, y - 1);
-                SetParentTileToCurrentTile(x, y - 1);
+                ConsiderTile(northTile);
             }
-            if (y + 1 <= _mapService.Height && _tileService.TilePassable(_mapService.Map[x, y + 1].SwampTileType))
+            if (southTile != null)
             {
-                AddToOpenTiles(x, y + 1);
-                SetParentTileToCurrentTile(x, y + 1);
+                ConsiderTile(southTile);
             }
-            if (x - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x - 1, y].SwampTileType))
+            if (westTile != null)
             {
-                AddToOpenTiles(x - 1, y);
-                SetParentTileToCurrentTile(x - 1, y);
+                ConsiderTile(westTile);
             }
-            if (x + 1 <= _mapService.Width && _tileService.TilePassable(_mapService.Map[x + 1, y].SwampTileType))
+            if (eastTile != null)
             {
-                AddToOpenTiles(x + 1, y);
-                SetParentTileToCurrentTile(x + 1, y);
+                ConsiderTile(eastTile);
             }
         }
 
-        private void AddToOpenTiles(int x, int y)
+        internal void ConsiderTile(SwampTile tile)
         {
-            _openTiles.Add(_mapService.Map[x, y]);
+            if (_currentTile == _startingTile)
+            {
+                tile.ParentSwampTile = _currentTile;
+                _openTiles.Add(tile);
+            }
+            else
+            {
+                if (_openTiles.Contains(tile))
+                {
+                    if (tile.MovementCostFromStartingPoint > _currentTile.MovementCostFromStartingPoint + 10)
+                    {
+                        tile.ParentSwampTile = _currentTile;
+                    }
+                }
+                _openTiles.Add(tile);
+            }
         }
-
-        private void SetParentTileToCurrentTile(int x, int y)
-        {
-            _mapService.Map[x, y].ParentSwampTile = _currentTile;
-        }
-
     }
 }

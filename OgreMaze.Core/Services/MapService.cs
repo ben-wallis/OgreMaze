@@ -49,20 +49,20 @@ namespace OgreMaze.Core.Services
             }
         }
 
-        public SwampTile FindStartingTile()
+        public SwampTile FindFirstTileContaining(TileType tileType)
         {
             for (var y = 0; y < Map.GetLength(1); y++)
             {
                 for (var x = 0; x < Map.GetLength(0); x++)
                 {
-                    if (Map[x, y].SwampTileType == TileType.Ogre)
+                    if (Map[x, y].SwampTileType == tileType)
                     {
                         return Map[x, y];
                     }
                 }
             }
 
-            throw new Exception("No ogre in map!");
+            throw new Exception("No occurances of the specified in map!");
         }
     }
 }

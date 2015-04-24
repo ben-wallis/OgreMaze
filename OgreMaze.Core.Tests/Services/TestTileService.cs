@@ -44,11 +44,12 @@ namespace OgreMaze.Core.Tests.Services
         {
             // Arrange
             var testTileType = TileServiceTestUtility.TileTypeTextToEnum(tileType);
+            var testTile = new SwampTile(testTileType, 0, 0);
 
             var tileService = new TileService();
 
             // Act
-            var result = tileService.TilePassable(testTileType);
+            var result = tileService.TilePassable(testTile);
 
             // Assert
             Assert.AreEqual(expectedResult, result);

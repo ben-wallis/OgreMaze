@@ -19,7 +19,7 @@ namespace OgreMaze.Core
         public int EstimatedMovementCostToDestination { get; set; } // H
         public SwampTile ParentSwampTile { get; set; }
 
-        private int Cost
+        public int Cost
         {
             get
             {

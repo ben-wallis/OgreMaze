@@ -34,13 +34,13 @@ namespace OgreMaze.Core.Tests
         public void Navigate_CallsFindStartingPoint()
         {
             // Arrange
-            _testUtility.MockMapService.Setup(m => m.FindStartingTile()).Verifiable();
+            _testUtility.MockMapService.Setup(m => m.FindFirstTileContaining(TileType.Ogre)).Verifiable();
 
             // Act
             _testUtility.TestSwampNavigator.Navigate(_testUtility.TestPath);
 
             // Assert
-            _testUtility.MockMapService.Verify(m => m.FindStartingTile());
+            _testUtility.MockMapService.Verify(m => m.FindFirstTileContaining(TileType.Ogre));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace OgreMaze.Core.Tests
             // Arrange
 
             // Act
-            _testUtility.TestSwampNavigator.FindNeighbouringOpenTiles(_testUtility.TestMap1[0,0]);
+            _testUtility.TestSwampNavigator.ConsiderNeighbouringTiles(_testUtility.TestMap1[0,0]);
 
             // Assert
             Assert.That(_testUtility.TestSwampNavigator._openTiles, Contains.Item(_testUtility.TestMap1[1, 0]));
@@ -63,7 +63,7 @@ namespace OgreMaze.Core.Tests
             // Arrange
 
             // Act
-            _testUtility.TestSwampNavigator.FindNeighbouringOpenTiles(_testUtility.TestMap1[1,1]);
+            _testUtility.TestSwampNavigator.ConsiderNeighbouringTiles(_testUtility.TestMap1[1,1]);
 
             // Assert
             Assert.That(_testUtility.TestSwampNavigator._openTiles, Contains.Item(_testUtility.TestMap1[1, 0]));
