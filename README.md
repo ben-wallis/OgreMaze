@@ -8,7 +8,9 @@ The pathfinding is done using the A* search algorithm (http://en.wikipedia.org/w
 
 Depending on whether OgreMaze.Core or OgreMaze.UI is set as the startup project, the application can operate in both console and UI modes.
 
-CastleWindsor is used for dependency injection, and NUnit/Moq are used for unit testing although I didn't really stick to TDD for this project. 
+CastleWindsor is used for dependency injection, and NUnit/Moq are used for unit testing although I didn't really stick to TDD for this project.
+
+Free RPG Tileset from http://telles0808.deviantart.com/art/RPG-Maker-VX-RTP-Tileset-159218223
 
 # Screenshots
 
