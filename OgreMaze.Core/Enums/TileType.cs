@@ -5,6 +5,7 @@
         Empty,
         Ogre,
         SinkHole,
-        Gold
+        Gold,
+        OgreFootprints
     }
 }

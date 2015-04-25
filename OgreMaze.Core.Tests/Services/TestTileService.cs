@@ -22,7 +22,7 @@ namespace OgreMaze.Core.Tests.Services
         [TestCase("O", "SinkHole")]
         [TestCase(".", "Empty")]
         [TestCase("$", "Gold")]
-        public void TestGetTileTypeFromString_Ogre_ReturnsCorrectTileType(string inputString, string tileType)
+        public void TestGetTileTypeFromString_ReturnsCorrectTileType(string inputString, string tileType)
         {
             // Arrange
             var expectedTileType = TileServiceTestUtility.TileTypeTextToEnum(tileType);
@@ -34,6 +34,24 @@ namespace OgreMaze.Core.Tests.Services
 
             // Assert
             Assert.AreEqual(expectedTileType, result);
+        }
+
+        [TestCase("Ogre", '@')]
+        [TestCase("SinkHole", 'O')]
+        [TestCase("Empty", '.')]
+        [TestCase("Gold", '$')]
+        [TestCase("OgreFootprints", '&')]
+        public void TestGetCharFromTileType_ReturnsCorrectChar(string tileType, char expectedResult)
+        {
+            var inputTileType = TileServiceTestUtility.TileTypeTextToEnum(tileType);
+
+            var tileService = new TileService();
+
+            // Act
+            var result = tileService.GetCharFromTileType(inputTileType);
+
+            // Assert
+            Assert.AreEqual(expectedResult, result);
         }
         
         [TestCase("Ogre", true)]
@@ -69,6 +87,8 @@ namespace OgreMaze.Core.Tests.Services
                         return TileType.Empty;
                     case "Gold":
                         return TileType.Gold;
+                    case "OgreFootprints":
+                        return TileType.OgreFootprints;
                     default:
                         throw new Exception("Invalid Tile Type");
                 }

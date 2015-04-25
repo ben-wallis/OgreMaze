@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OgreMaze.Core.Enums;
 
@@ -62,7 +63,46 @@ namespace OgreMaze.Core.Services
                 }
             }
 
-            throw new Exception("No occurances of the specified in map!");
+            throw new Exception("No occurrences of the specified in map!");
+        }
+
+        public bool OgreCanFitInTile(SwampTile tile)
+        {
+            if (tile.X + 1 > Width || tile.Y + 1 > Height)
+            {
+                return false;
+            }
+
+            var eastTilePassable = _tileService.TilePassable(Map[tile.X + 1, tile.Y]);
+            var southTilePassable = _tileService.TilePassable(Map[tile.X, tile.Y + 1]);
+            var southEastTilePassable = _tileService.TilePassable(Map[tile.X + 1, tile.Y + 1]);
+            return (eastTilePassable && southTilePassable && southEastTilePassable);
+        }
+
+        public List<SwampTile> GetDropZoneTiles(SwampTile destinationTile)
+        {
+            var dropZoneTiles = new List<SwampTile> {destinationTile};
+
+            // Ogres are fat, add up to 3 other possible tiles that will make him touch the gold
+            var northOfDest = destinationTile.Y - 1 >= 0 ? Map[destinationTile.X, destinationTile.Y - 1] : null;
+            var westOfDest = destinationTile.X - 1 >= 0 ? Map[destinationTile.X - 1, destinationTile.Y] : null;
+            var northWestOfDest = destinationTile.Y - 1 >= 0 && destinationTile.X - 1 >= 0
+                ? Map[destinationTile.X - 1, destinationTile.Y - 1]
+                : null;
+
+            dropZoneTiles.Add(northOfDest);
+            dropZoneTiles.Add(westOfDest);
+            dropZoneTiles.Add(northWestOfDest);
+
+            return dropZoneTiles;
+        }
+
+        public void RecordOgreFootPrints(SwampTile tile)
+        {
+            Map[tile.X, tile.Y].SwampTileType = TileType.OgreFootprints;
+            Map[tile.X, tile.Y + 1].SwampTileType = TileType.OgreFootprints;
+            Map[tile.X + 1, tile.Y + 1].SwampTileType = TileType.OgreFootprints;
+            Map[tile.X + 1, tile.Y].SwampTileType = TileType.OgreFootprints;
         }
     }
 }

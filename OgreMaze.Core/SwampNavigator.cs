@@ -12,11 +12,11 @@ namespace OgreMaze.Core
         private readonly ITileService _tileService;
         private SwampTile _startingTile;
         private SwampTile _destinationTile;
-        private List<SwampTile> _destinationTiles = new List<SwampTile>();
+        private List<SwampTile> _dropZoneTiles = new List<SwampTile>();
         private SwampTile _currentTile;
 
-        internal List<SwampTile> _openTiles = new List<SwampTile>();
-        internal List<SwampTile> _closedTiles = new List<SwampTile>();
+        private readonly List<SwampTile> _openTiles = new List<SwampTile>();
+        private readonly List<SwampTile> _closedTiles = new List<SwampTile>();
  
         public SwampNavigator(IMapService mapService, ITileService tileService)
         {
@@ -29,60 +29,79 @@ namespace OgreMaze.Core
             _mapService.LoadMap(mapFile);
             _startingTile = _mapService.FindFirstTileContaining(TileType.Ogre);
             _destinationTile = _mapService.FindFirstTileContaining(TileType.Gold);
-            _destinationTiles.Add(_destinationTile);
-
-            // Ogres are fat, add up to 3 possible tiles that will make him touch the gold
-            if (_destinationTile.Xpos - 1 >= 0)
-            {
-                _destinationTiles.Add(_mapService.Map[_destinationTile.Xpos - 1, _destinationTile.Ypos]);
-                if (_destinationTile.Ypos - 1 >= 0)
-                {
-                    _destinationTiles.Add(_mapService.Map[_destinationTile.Xpos - 1, _destinationTile.Ypos - 1]);
-                }
-            }
-            if (_destinationTile.Ypos - 1 >= 0)
-            {
-                _destinationTiles.Add(_mapService.Map[_destinationTile.Xpos, _destinationTile.Ypos - 1]);
-            }
+            _dropZoneTiles = _mapService.GetDropZoneTiles(_destinationTile);
             
             _currentTile = _startingTile;
             _openTiles.Add(_startingTile);
             
-            while (!_closedTiles.Any(c => _destinationTiles.Any(d => d == c)))
+            // Main A* algorithm loop, runs until destination reached (any of the drop zone tiles are added to the closed list)
+            // or there are no more options to consider
+            while (!_closedTiles.Any(c => _dropZoneTiles.Any(d => d == c)))
             {
                 _currentTile = GetLowestCostTileFromOpenTiles();
                 _openTiles.Remove(_currentTile);
                 _closedTiles.Add(_currentTile);
-
                 ConsiderNeighbouringTiles(_currentTile);
-
                 UpdateOpenTileCosts();
             }
 
-            _currentTile = _closedTiles.First(c => _destinationTiles.Any(d => d == c));
-
+            // Destination reached, set the current tile to the tile in the drop zone that's reached
+            // the closed list so we can walk back from it to draw the ogre's path.
+            _currentTile = _closedTiles.First(c => _dropZoneTiles.Any(d => d == c));
 
             DrawPath();
         }
 
-        private void DrawPath()
+        internal void ConsiderNeighbouringTiles(SwampTile tile)
         {
-            while (_currentTile != _startingTile)
+            if (TileValidForConsideration(tile.X, tile.Y - 1))
             {
-                _mapService.Map[_currentTile.Xpos, _currentTile.Ypos].SwampTileType = TileType.Ogre;
-                _currentTile = _currentTile.ParentSwampTile;
+                ConsiderTile(_mapService.Map[tile.X, tile.Y - 1]);
             }
-            for (var y = 0; y <= _mapService.Height; y++)
-            {
-                var line = String.Empty;
 
-                for (var x = 0; x <= _mapService.Width; x++)
-                {
-                    line += _tileService.GetCharFromTileType(_mapService.Map[x, y].SwampTileType);
-                }
-                Console.WriteLine(line);
+            if (TileValidForConsideration(tile.X, tile.Y + 1))
+            {
+                ConsiderTile(_mapService.Map[tile.X, tile.Y + 1]);
             }
-            Console.ReadLine();
+
+            if (TileValidForConsideration(tile.X - 1, tile.Y))
+            {
+                ConsiderTile(_mapService.Map[tile.X - 1, tile.Y]);
+            }
+
+            if (TileValidForConsideration(tile.X + 1, tile.Y))
+            {
+                ConsiderTile(_mapService.Map[tile.X + 1, tile.Y]);
+            }
+        }
+
+        private bool TileValidForConsideration(int x, int y)
+        {
+            // If the tile is:
+            // a) Within the bounds of the map
+            // b) A passable tile (not a sinkhole)
+            // c) Not in the closed list
+            // d) Big enough to fit an Ogre (the East, SouthEast and South tiles are also passable)
+            // Then it is valid for consideration.
+            return x <= _mapService.Width && y <= _mapService.Height && x >= 0 && y >= 0 &&
+                   _tileService.TilePassable(_mapService.Map[x, y]) && !_closedTiles.Contains(_mapService.Map[x, y]) &&
+                   _mapService.OgreCanFitInTile(_mapService.Map[x, y]);
+        }
+        
+        internal void ConsiderTile(SwampTile tile)
+        {
+            if (!_openTiles.Contains(tile))
+            {
+                _openTiles.Add(tile);
+                tile.ParentSwampTile = _currentTile;
+            }
+            else
+            {
+                if (tile.MovementCostFromStartingPoint > (_currentTile.MovementCostFromStartingPoint + 10))
+                {
+                    tile.ParentSwampTile = _currentTile;
+                }
+            }
         }
 
         private void UpdateOpenTileCosts()
@@ -100,94 +119,35 @@ namespace OgreMaze.Core
             {
                 return _openTiles.OrderBy(p => p.Cost).First();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine("Ran out of open tiles");
+                // If there are no more open tiles to consider, there is no possible path to the gold. Sad Ogre :(
+                Console.WriteLine("Ran out of open tiles, ogre has ran out of options!");
                 DrawPath();
                 return _currentTile;
             }
         }
-
-        private bool OgreCanFitInTile(SwampTile tile)
+        
+        private void DrawPath()
         {
-            var x = tile.Xpos;
-            var y = tile.Ypos;
-
-            if (tile == _destinationTile)
+            _mapService.RecordOgreFootPrints(_currentTile);
+            while (_currentTile.ParentSwampTile != null)
             {
-                return true;
+                _currentTile = _currentTile.ParentSwampTile;
+                _mapService.RecordOgreFootPrints(_currentTile);
             }
 
-            if (x + 1 > _mapService.Width || y + 1 > _mapService.Height)
+            for (var y = 0; y <= _mapService.Height; y++)
             {
-                return false;
-            }
+                var line = String.Empty;
 
-            var eastTilePassable = _tileService.TilePassable(_mapService.Map[x + 1, y]);
-            var southTilePassable = _tileService.TilePassable(_mapService.Map[x, y + 1]);
-            var southEastTilePassable = _tileService.TilePassable(_mapService.Map[x + 1, y + 1]);
-            return (eastTilePassable && southTilePassable && southEastTilePassable);
-        }
-
-        internal void ConsiderNeighbouringTiles(SwampTile tile)
-        {
-            var x = tile.Xpos;
-            var y = tile.Ypos;
-
-            var northTile = y - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x, y - 1]) &&
-                            !_closedTiles.Contains(_mapService.Map[x, y - 1]) &&
-                            OgreCanFitInTile(_mapService.Map[x, y - 1])
-                ? _mapService.Map[x, y - 1]
-                : null;
-            var southTile = y + 1 <= _mapService.Height && _tileService.TilePassable(_mapService.Map[x, y + 1]) &&
-                            !_closedTiles.Contains(_mapService.Map[x, y + 1]) &&
-                            OgreCanFitInTile(_mapService.Map[x, y + 1])
-                ? _mapService.Map[x, y + 1]
-                : null;
-            var westTile = x - 1 >= 0 && _tileService.TilePassable(_mapService.Map[x - 1, y]) &&
-                           !_closedTiles.Contains(_mapService.Map[x - 1, y]) &&
-                           OgreCanFitInTile(_mapService.Map[x - 1, y])
-                ? _mapService.Map[x - 1, y]
-                : null;
-
-            var eastTile = x + 1 <= _mapService.Width && _tileService.TilePassable(_mapService.Map[x + 1, y]) &&
-                           !_closedTiles.Contains(_mapService.Map[x + 1, y]) &&
-                           OgreCanFitInTile(_mapService.Map[x + 1, y])
-                ? _mapService.Map[x + 1, y]
-                : null;
-
-            if (northTile != null)
-            {
-                ConsiderTile(northTile);
-            }
-            if (southTile != null)
-            {
-                ConsiderTile(southTile);
-            }
-            if (westTile != null)
-            {
-                ConsiderTile(westTile);
-            }
-            if (eastTile != null)
-            {
-                ConsiderTile(eastTile);
-            }
-        }
-
-        internal void ConsiderTile(SwampTile tile)
-        {
-            if (!_openTiles.Contains(tile))
-            {
-                _openTiles.Add(tile);
-                tile.ParentSwampTile = _currentTile;
-            }
-            else
-            {
-                if (tile.MovementCostFromStartingPoint > (_currentTile.MovementCostFromStartingPoint + 10))
+                for (var x = 0; x <= _mapService.Width; x++)
                 {
-                    tile.ParentSwampTile = _currentTile;
+                    line += _tileService.GetCharFromTileType(_mapService.Map[x, y].SwampTileType);
                 }
+                Console.WriteLine(line);
             }
+            Console.ReadLine();
         }
     }
 }

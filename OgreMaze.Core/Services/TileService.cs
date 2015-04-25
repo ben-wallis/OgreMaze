@@ -34,6 +34,8 @@ namespace OgreMaze.Core.Services
                     return '$';
                 case TileType.SinkHole:
                     return 'O';
+                case TileType.OgreFootprints:
+                    return '&';
                 default:
                     throw new Exception("Invalid Tile Type");
             }

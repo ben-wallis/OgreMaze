@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using OgreMaze.Core.Enums;
@@ -56,15 +57,14 @@ namespace OgreMaze.Core.Tests.Services
 
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap1);
-            _testUtility.MockTileService.Setup(t => t.GetTileTypeFromChar('@')).Returns(TileType.Ogre);
             _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
 
             // Act
             var result = _testUtility.TestMapService.FindFirstTileContaining(TileType.Ogre);
 
             // Assert
-            Assert.AreEqual(ExpectedXCoordinate, result.Xpos);
-            Assert.AreEqual(ExpectedYCoordinate, result.Ypos);
+            Assert.AreEqual(ExpectedXCoordinate, result.X);
+            Assert.AreEqual(ExpectedYCoordinate, result.Y);
         }
 
         [Test]
@@ -76,15 +76,77 @@ namespace OgreMaze.Core.Tests.Services
 
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap2);
-            _testUtility.MockTileService.Setup(t => t.GetTileTypeFromChar('@')).Returns(TileType.Ogre);
             _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
 
             // Act
             var result = _testUtility.TestMapService.FindFirstTileContaining(TileType.Ogre);
 
             // Assert
-            Assert.AreEqual(ExpectedXCoordinate, result.Xpos);
-            Assert.AreEqual(ExpectedYCoordinate, result.Ypos);
+            Assert.AreEqual(ExpectedXCoordinate, result.X);
+            Assert.AreEqual(ExpectedYCoordinate, result.Y);
+        }
+
+        [Test]
+        public void OgreCanFitInTile_True_ReturnsTrue()
+        {
+            // Arrange
+            var testTile = new SwampTile(TileType.Empty, 5, 3);
+            _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
+                .Returns(_testUtility.TestMap2);
+
+            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+
+            _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[5, 4])).Returns(true);
+            _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[6, 3])).Returns(true);
+            _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[6, 4])).Returns(true);
+
+            // Act
+            var result = _testUtility.TestMapService.OgreCanFitInTile(testTile);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void OgreCanFitInTile_False_ReturnsFalse()
+        {
+            // Arrange
+            var testTile = new SwampTile(TileType.Empty, 5, 3);
+            _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
+                .Returns(_testUtility.TestMap2);
+
+            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+
+            _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[5, 4])).Returns(true);
+            _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[6, 3])).Returns(false);
+            _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[6, 4])).Returns(true);
+
+            // Act
+            var result = _testUtility.TestMapService.OgreCanFitInTile(testTile);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+
+        [Test]
+        public void RecordOgreFootprints_SwitchesCorrectTilesToOgreFootprints()
+        {
+            // Arrange
+            var testTile = new SwampTile(TileType.Empty, 0, 0);
+
+            _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
+                .Returns(_testUtility.TestMap1);
+            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            
+            // Act
+            _testUtility.TestMapService.RecordOgreFootPrints(testTile);
+
+            // Assert
+            Assert.AreEqual(TileType.OgreFootprints, _testUtility.TestMapService.Map[0, 0].SwampTileType);
+            Assert.AreEqual(TileType.OgreFootprints, _testUtility.TestMapService.Map[0, 1].SwampTileType);
+            Assert.AreEqual(TileType.OgreFootprints, _testUtility.TestMapService.Map[1, 0].SwampTileType);
+            Assert.AreEqual(TileType.OgreFootprints, _testUtility.TestMapService.Map[1, 1].SwampTileType);
         }
 
         private class SwampMapTestUtility
@@ -123,6 +185,11 @@ namespace OgreMaze.Core.Tests.Services
                     "O..O...@@.",
                     ".......@@."
                 };
+
+                MockTileService.Setup(t => t.GetTileTypeFromChar('@')).Returns(TileType.Ogre);
+                MockTileService.Setup(t => t.GetTileTypeFromChar('.')).Returns(TileType.Empty);
+                MockTileService.Setup(t => t.GetTileTypeFromChar('O')).Returns(TileType.SinkHole);
+                MockTileService.Setup(t => t.GetTileTypeFromChar('$')).Returns(TileType.Gold);
 
                 TestMapFilePath = "C:\\Test.txt";
 

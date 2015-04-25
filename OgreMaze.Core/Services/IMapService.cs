@@ -1,4 +1,5 @@
-﻿using OgreMaze.Core.Enums;
+﻿using System.Collections.Generic;
+using OgreMaze.Core.Enums;
 
 namespace OgreMaze.Core.Services
 {
@@ -10,5 +11,8 @@ namespace OgreMaze.Core.Services
         void LoadMap(string mapFilePath);
 
         SwampTile FindFirstTileContaining(TileType tileType);
+        List<SwampTile> GetDropZoneTiles(SwampTile destinationTile);
+        bool OgreCanFitInTile(SwampTile tile);
+        void RecordOgreFootPrints(SwampTile tile);
     }
 }

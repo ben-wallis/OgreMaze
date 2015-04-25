@@ -8,13 +8,13 @@ namespace OgreMaze.Core
         public SwampTile(TileType tileType, int xPos, int yPos)
         {
             SwampTileType = tileType;
-            Xpos = xPos;
-            Ypos = yPos;
+            X = xPos;
+            Y = yPos;
         }
 
         public TileType SwampTileType { get; set; }
-        public int Xpos { get; private set; }
-        public int Ypos { get; private set; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
 
         public int MovementCostFromStartingPoint { get; set; } // G
         public SwampTile ParentSwampTile { get; set; }
@@ -23,8 +23,8 @@ namespace OgreMaze.Core
 
         public int EstimatedCostToTile(SwampTile tile)
         {
-            var estimatedHorizontalMovementToDestination = Math.Abs(tile.Xpos - Xpos);
-            var estimatedVerticalMovementToDestination = Math.Abs(tile.Ypos - Ypos);
+            var estimatedHorizontalMovementToDestination = Math.Abs(tile.X - X);
+            var estimatedVerticalMovementToDestination = Math.Abs(tile.Y - Y);
             return (estimatedVerticalMovementToDestination
                     + estimatedHorizontalMovementToDestination)*10;
         }
