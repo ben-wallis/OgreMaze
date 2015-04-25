@@ -9,3 +9,9 @@ The pathfinding is done using the A* search algorithm (http://en.wikipedia.org/w
 Depending on whether OgreMaze.Core or OgreMaze.UI is set as the startup project, the application can operate in both console and UI modes.
 
 CastleWindsor is used for dependency injection, and NUnit/Moq are used for unit testing although I didn't really stick to TDD for this project. 
+
+# Screenshots
+
+![ChallengeMap1](http://i.imgur.com/nyiRP0u.png)
+![RandomMapNoPathFound](http://i.imgur.com/LfbBJ3e.png)
+![RandomMapPathFound](http://i.imgur.com/bqjls7p.png)
