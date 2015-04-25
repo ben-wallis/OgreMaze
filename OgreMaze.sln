@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OgreMaze.Core", "OgreMaze.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OgreMaze.Core.Tests", "OgreMaze.Core.Tests\OgreMaze.Core.Tests.csproj", "{875837C3-2FEF-484D-9587-221D08A9B6EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OgreMaze.UI", "OgreMaze.UI\OgreMaze.UI.csproj", "{3B1C7B0A-2FDC-460E-8CCB-2CE63634F276}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OgreMaze.UI.Tests", "OgreMaze.UI.Tests\OgreMaze.UI.Tests.csproj", "{51A6A151-DB0A-41B9-AAB3-1C60B1976600}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{875837C3-2FEF-484D-9587-221D08A9B6EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{875837C3-2FEF-484D-9587-221D08A9B6EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{875837C3-2FEF-484D-9587-221D08A9B6EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B1C7B0A-2FDC-460E-8CCB-2CE63634F276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B1C7B0A-2FDC-460E-8CCB-2CE63634F276}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B1C7B0A-2FDC-460E-8CCB-2CE63634F276}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B1C7B0A-2FDC-460E-8CCB-2CE63634F276}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A6A151-DB0A-41B9-AAB3-1C60B1976600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A6A151-DB0A-41B9-AAB3-1C60B1976600}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A6A151-DB0A-41B9-AAB3-1C60B1976600}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A6A151-DB0A-41B9-AAB3-1C60B1976600}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

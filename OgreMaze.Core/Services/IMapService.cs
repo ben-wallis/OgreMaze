@@ -3,7 +3,7 @@ using OgreMaze.Core.Enums;
 
 namespace OgreMaze.Core.Services
 {
-    internal interface IMapService
+    public interface IMapService
     {
         SwampTile[,] Map { get; }
         int Width { get; }

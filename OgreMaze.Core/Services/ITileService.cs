@@ -2,7 +2,7 @@
 
 namespace OgreMaze.Core.Services
 {
-    internal interface ITileService
+    public interface ITileService
     {
         TileType GetTileTypeFromChar(char inputChar);
         char GetCharFromTileType(TileType tileType);

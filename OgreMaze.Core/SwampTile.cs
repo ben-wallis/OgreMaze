@@ -5,6 +5,8 @@ namespace OgreMaze.Core
 {
     public class SwampTile
     {
+        private TileType _swampTileType;
+
         public SwampTile(TileType tileType, int xPos, int yPos)
         {
             SwampTileType = tileType;
@@ -12,7 +14,12 @@ namespace OgreMaze.Core
             Y = yPos;
         }
 
-        public TileType SwampTileType { get; set; }
+        public TileType SwampTileType
+        {
+            get { return _swampTileType; }
+            set { _swampTileType = value; }
+        }
+
         public int X { get; private set; }
         public int Y { get; private set; }
 

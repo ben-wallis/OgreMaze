@@ -2,7 +2,7 @@
 
 namespace OgreMaze.Core.Services
 {
-    internal interface IFileSystemService
+    public interface IFileSystemService
     {
         IEnumerable<string> ReadFileAsIEnumerable(string filePath);
     }

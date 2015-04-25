@@ -1,8 +1,9 @@
 ﻿namespace OgreMaze.Core
 {
-    internal interface ISwampNavigator
+    public interface ISwampNavigator
     {
-        void GenerateMapAndNavigate(int width, int height);
+        bool GenerateMapAndNavigate(int width, int height);
         void NavigateMap(string mapFile);
+        void DrawPath();
     }
 }

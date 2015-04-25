@@ -156,6 +156,7 @@ namespace OgreMaze.Core.Tests.Services
                 // Mock Setups
                 MockFileSystemService = new Mock<IFileSystemService>();
                 MockTileService = new Mock<ITileService>();
+                MockMapGenerationService = new Mock<IMapGenerationService>();
 
                 // Test Maps Setup
                 TestMap1 = new List<string>
@@ -194,11 +195,12 @@ namespace OgreMaze.Core.Tests.Services
                 TestMapFilePath = "C:\\Test.txt";
 
                 // Class under test instantiation
-                TestMapService = new MapService(MockFileSystemService.Object, MockTileService.Object);
+                TestMapService = new MapService(MockFileSystemService.Object, MockTileService.Object, MockMapGenerationService.Object);
             }
 
             public Mock<IFileSystemService> MockFileSystemService { get; private set; }
             public Mock<ITileService> MockTileService { get; private set; }
+            public Mock<IMapGenerationService> MockMapGenerationService { get; private set; }
 
             public MapService TestMapService { get; private set; }
 

@@ -6,7 +6,7 @@ using OgreMaze.Core.Services;
 
 namespace OgreMaze.Core
 {
-    internal class SwampNavigator : ISwampNavigator
+    public class SwampNavigator : ISwampNavigator
     {
         private readonly IMapService _mapService;
         private readonly ITileService _tileService;
@@ -24,10 +24,10 @@ namespace OgreMaze.Core
             _tileService = tileService;
         }
 
-        public void GenerateMapAndNavigate(int width, int height)
+        public bool GenerateMapAndNavigate(int width, int height)
         {
             _mapService.GenerateAndLoadMap(width, height);
-            NavigateMap();
+            return NavigateMap();
         }
 
         public void NavigateMap(string mapFile)
@@ -36,34 +36,48 @@ namespace OgreMaze.Core
             NavigateMap();
         }
 
-        public void NavigateMap()
+        public bool NavigateMap()
         {
             _startingTile = _mapService.FindFirstTileContaining(TileType.Ogre);
             _destinationTile = _mapService.FindFirstTileContaining(TileType.Gold);
             _dropZoneTiles = _mapService.GetDropZoneTiles(_destinationTile);
             
             _currentTile = _startingTile;
+            _openTiles.Clear();
+            _closedTiles.Clear();
+
             _openTiles.Add(_startingTile);
             
             // Main A* algorithm loop, runs until destination reached (any of the drop zone tiles are added to the closed list)
             // or there are no more options to consider
-            while (!_closedTiles.Any(c => _dropZoneTiles.Any(d => d == c)))
-            {
-                _currentTile = GetLowestCostTileFromOpenTiles();
-                _openTiles.Remove(_currentTile);
-                _closedTiles.Add(_currentTile);
-                ConsiderNeighbouringTiles(_currentTile);
-                UpdateOpenTileCosts();
+            try {
+                while (!_closedTiles.Any(c => _dropZoneTiles.Any(d => d == c)))
+                {
+                    _currentTile = GetLowestCostTileFromOpenTiles();
+                    _openTiles.Remove(_currentTile);
+                    _closedTiles.Add(_currentTile);
+                    ConsiderNeighbouringTiles(_currentTile);
+                    UpdateOpenTileCosts();
+                }
+                // Destination reached, set the current tile to the tile in the drop zone that's reached
+                // the closed list so we can walk back from it to draw the ogre's path.
+                _currentTile = _closedTiles.First(c => _dropZoneTiles.Any(d => d == c));
+
+                Console.WriteLine(string.Empty);
+                Console.WriteLine("The ogre has found his gold, yay!");
+                Console.WriteLine(string.Empty);
+                return true;
             }
+            catch (InvalidOperationException e)
+            {
+                if (e.Message != "Sequence contains no elements") throw;
 
-            // Destination reached, set the current tile to the tile in the drop zone that's reached
-            // the closed list so we can walk back from it to draw the ogre's path.
-            _currentTile = _closedTiles.First(c => _dropZoneTiles.Any(d => d == c));
-
-            Console.WriteLine(string.Empty);
-            Console.WriteLine("The ogre has found his gold!");
-            Console.WriteLine(string.Empty);
-            DrawPath();
+                // If there are no more open tiles to consider, there is no possible path to the gold. Sad Ogre :(
+                Console.WriteLine(string.Empty);
+                Console.WriteLine("No more open tiles, ogre has ran out of options! Gold is unreachable :(");
+                Console.WriteLine(string.Empty);
+                return false;
+            }
         }
 
         internal void ConsiderNeighbouringTiles(SwampTile tile)
@@ -129,22 +143,10 @@ namespace OgreMaze.Core
 
         private SwampTile GetLowestCostTileFromOpenTiles()
         {
-            try
-            {
-                return _openTiles.OrderBy(p => p.Cost).First();
-            }
-            catch (Exception)
-            {
-                // If there are no more open tiles to consider, there is no possible path to the gold. Sad Ogre :(
-                Console.WriteLine(string.Empty);
-                Console.WriteLine("No more open tiles, ogre has ran out of options! Gold is unreachable :(");
-                Console.WriteLine(string.Empty);
-                DrawPath();
-                return _currentTile;
-            }
+            return _openTiles.OrderBy(p => p.Cost).First();
         }
         
-        private void DrawPath()
+        public void DrawPath()
         {
             _mapService.RecordOgreFootPrints(_currentTile);
             while (_currentTile.ParentSwampTile != null)

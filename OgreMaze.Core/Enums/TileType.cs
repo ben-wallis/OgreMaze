@@ -6,6 +6,7 @@
         Ogre,
         SinkHole,
         Gold,
-        OgreFootprints
+        OgreFootprints,
+        BullshitTileType
     }
 }
