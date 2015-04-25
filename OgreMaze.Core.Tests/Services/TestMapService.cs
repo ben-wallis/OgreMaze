@@ -27,7 +27,7 @@ namespace OgreMaze.Core.Tests.Services
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath)).Returns(testMapList);
             
             // Act
-            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath);
 
             // Assert
             Assert.IsNotNull(_testUtility.TestMapService.Map);
@@ -45,7 +45,7 @@ namespace OgreMaze.Core.Tests.Services
             // Act
             
             // Assert
-            Assert.Throws<Exception>(() => _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath));
+            Assert.Throws<Exception>(() => _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath));
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace OgreMaze.Core.Tests.Services
 
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap1);
-            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath);
 
             // Act
             var result = _testUtility.TestMapService.FindFirstTileContaining(TileType.Ogre);
@@ -76,7 +76,7 @@ namespace OgreMaze.Core.Tests.Services
 
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap2);
-            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath);
 
             // Act
             var result = _testUtility.TestMapService.FindFirstTileContaining(TileType.Ogre);
@@ -94,7 +94,7 @@ namespace OgreMaze.Core.Tests.Services
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap2);
 
-            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath);
 
             _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[5, 4])).Returns(true);
             _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[6, 3])).Returns(true);
@@ -115,7 +115,7 @@ namespace OgreMaze.Core.Tests.Services
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap2);
 
-            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath);
 
             _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[5, 4])).Returns(true);
             _testUtility.MockTileService.Setup(t => t.TilePassable(_testUtility.TestMapService.Map[6, 3])).Returns(false);
@@ -137,7 +137,7 @@ namespace OgreMaze.Core.Tests.Services
 
             _testUtility.MockFileSystemService.Setup(f => f.ReadFileAsIEnumerable(_testUtility.TestMapFilePath))
                 .Returns(_testUtility.TestMap1);
-            _testUtility.TestMapService.LoadMap(_testUtility.TestMapFilePath);
+            _testUtility.TestMapService.LoadMapFromFile(_testUtility.TestMapFilePath);
             
             // Act
             _testUtility.TestMapService.RecordOgreFootPrints(testTile);

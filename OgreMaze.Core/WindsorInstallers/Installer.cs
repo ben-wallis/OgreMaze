@@ -32,6 +32,13 @@ namespace OgreMaze.Core.WindsorInstallers
 
             container.Register(
                 Component
+                    .For<IMapGenerationService>()
+                    .ImplementedBy<MapGenerationService>()
+                    .LifestyleSingleton()
+                );
+
+            container.Register(
+                Component
                     .For<ISwampNavigator>()
                     .ImplementedBy<SwampNavigator>()
                     .LifestyleSingleton()

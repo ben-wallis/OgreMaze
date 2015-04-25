@@ -24,9 +24,20 @@ namespace OgreMaze.Core
             _tileService = tileService;
         }
 
-        public void Navigate(string mapFile)
+        public void GenerateMapAndNavigate(int width, int height)
         {
-            _mapService.LoadMap(mapFile);
+            _mapService.GenerateAndLoadMap(width, height);
+            NavigateMap();
+        }
+
+        public void NavigateMap(string mapFile)
+        {
+            _mapService.LoadMapFromFile(mapFile);
+            NavigateMap();
+        }
+
+        public void NavigateMap()
+        {
             _startingTile = _mapService.FindFirstTileContaining(TileType.Ogre);
             _destinationTile = _mapService.FindFirstTileContaining(TileType.Gold);
             _dropZoneTiles = _mapService.GetDropZoneTiles(_destinationTile);
@@ -49,6 +60,9 @@ namespace OgreMaze.Core
             // the closed list so we can walk back from it to draw the ogre's path.
             _currentTile = _closedTiles.First(c => _dropZoneTiles.Any(d => d == c));
 
+            Console.WriteLine(string.Empty);
+            Console.WriteLine("The ogre has found his gold!");
+            Console.WriteLine(string.Empty);
             DrawPath();
         }
 
@@ -122,7 +136,9 @@ namespace OgreMaze.Core
             catch (Exception)
             {
                 // If there are no more open tiles to consider, there is no possible path to the gold. Sad Ogre :(
-                Console.WriteLine("Ran out of open tiles, ogre has ran out of options!");
+                Console.WriteLine(string.Empty);
+                Console.WriteLine("No more open tiles, ogre has ran out of options! Gold is unreachable :(");
+                Console.WriteLine(string.Empty);
                 DrawPath();
                 return _currentTile;
             }
@@ -137,16 +153,7 @@ namespace OgreMaze.Core
                 _mapService.RecordOgreFootPrints(_currentTile);
             }
 
-            for (var y = 0; y <= _mapService.Height; y++)
-            {
-                var line = String.Empty;
-
-                for (var x = 0; x <= _mapService.Width; x++)
-                {
-                    line += _tileService.GetCharFromTileType(_mapService.Map[x, y].SwampTileType);
-                }
-                Console.WriteLine(line);
-            }
+            _mapService.DrawMap();
             Console.ReadLine();
         }
     }

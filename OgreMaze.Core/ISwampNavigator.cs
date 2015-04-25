@@ -2,6 +2,7 @@
 {
     internal interface ISwampNavigator
     {
-        void Navigate(string mapFile);
+        void GenerateMapAndNavigate(int width, int height);
+        void NavigateMap(string mapFile);
     }
 }

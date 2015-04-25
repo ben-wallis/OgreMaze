@@ -8,8 +8,10 @@ namespace OgreMaze.Core.Services
         SwampTile[,] Map { get; }
         int Width { get; }
         int Height { get; }
-        void LoadMap(string mapFilePath);
-
+        
+        void GenerateAndLoadMap(int width, int height);
+        void LoadMapFromFile(string mapFilePath);
+        void DrawMap();
         SwampTile FindFirstTileContaining(TileType tileType);
         List<SwampTile> GetDropZoneTiles(SwampTile destinationTile);
         bool OgreCanFitInTile(SwampTile tile);

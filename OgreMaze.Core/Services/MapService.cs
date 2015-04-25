@@ -9,11 +9,13 @@ namespace OgreMaze.Core.Services
     {
         private readonly IFileSystemService _fileSystemService;
         private readonly ITileService _tileService;
+        private readonly IMapGenerationService _mapGenerationService;
 
-        public MapService(IFileSystemService fileSystemService, ITileService tileService)
+        public MapService(IFileSystemService fileSystemService, ITileService tileService, IMapGenerationService mapGenerationService)
         {
             _fileSystemService = fileSystemService;
             _tileService = tileService;
+            _mapGenerationService = mapGenerationService;
         }
 
         public SwampTile[,] Map { get; private set; }
@@ -21,7 +23,18 @@ namespace OgreMaze.Core.Services
         public int Width { get; private set; }
         public int Height { get; private set; }
 
-        public void LoadMap(string mapFilePath)
+        public void GenerateAndLoadMap(int width, int height)
+        {
+            Map = _mapGenerationService.GenerateMap(width, height);
+            Width = width - 1;
+            Height = height - 1;
+            Console.WriteLine("Generated new map:");
+            Console.WriteLine(string.Empty);
+            DrawMap();
+            Console.WriteLine(string.Empty);
+        }
+
+        public void LoadMapFromFile(string mapFilePath)
         {
             var mapContents = _fileSystemService.ReadFileAsIEnumerable(mapFilePath).ToList();
 
@@ -47,6 +60,20 @@ namespace OgreMaze.Core.Services
                 }
 
                 currentLine++;
+            }
+        }
+
+        public void DrawMap()
+        {
+            for (var y = 0; y <= Height; y++)
+            {
+                var line = String.Empty;
+
+                for (var x = 0; x <= Width; x++)
+                {
+                    line += _tileService.GetCharFromTileType(Map[x, y].SwampTileType);
+                }
+                Console.WriteLine(line);
             }
         }
 
