@@ -10,7 +10,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <converters:TileArrayToTileListConverter x:Key="TileArrayToTileListConverter" />
-        <converters:SwampTileToColourConverter x:Key="SwampTileToColourConverter" />
+        <converters:SwampTileToImageConverter x:Key="SwampTileToImageConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
@@ -25,14 +25,22 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="20" Height="20" Background="{Binding Converter={StaticResource SwampTileToColourConverter}}" />
+                                <Grid>
+                                    <Image Source="pack://application:,,,/OgreMaze.UI;component/TileSet/grass.png" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                                    <Image Source="{Binding Converter={StaticResource SwampTileToImageConverter}}" />
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="{Binding MazeHeight}" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
         </ItemsControl>
-        <ItemsControl Grid.Row="0" Grid.Column="0" ItemsSource="{Binding SwampTilesWithPath, Converter={StaticResource TileArrayToTileListConverter}}" Visibility="{Binding ShowPath, Converter={StaticResource BooleanToVisibilityConverter}}" Opacity="0.2">
+        <ItemsControl Grid.Row="0" Grid.Column="0" ItemsSource="{Binding SwampTilesWithPath, Converter={StaticResource TileArrayToTileListConverter}}" Visibility="{Binding ShowPath, Converter={StaticResource BooleanToVisibilityConverter}}" Opacity="0.5">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ItemsControl ItemsSource="{Binding}">
@@ -43,12 +51,20 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="20" Height="20" Background="{Binding Converter={StaticResource SwampTileToColourConverter}}" />
+                                <Grid>
+                                    <Image Source="pack://application:,,,/OgreMaze.UI;component/TileSet/grass.png" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                                    <Image Source="{Binding Converter={StaticResource SwampTileToImageConverter}}" />
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="{Binding MazeHeight}" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
         </ItemsControl>
     </Grid>
 </UserControl>

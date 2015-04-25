@@ -15,7 +15,9 @@ namespace OgreMaze.UI.ViewModels
 
         private int _generateMapHeight;
         private int _generateMapWidth;
+        private int _generateMapPercentSinkholes;
         private bool _pathFound;
+        private bool _showPath;
 
         public MainWindowViewModel(ISwampNavigator swampNavigator, IMazeControlViewModel mazeControlViewModel, IMapService mapService)
         {
@@ -23,13 +25,17 @@ namespace OgreMaze.UI.ViewModels
             _mapService = mapService;
             MazeControlViewModel = mazeControlViewModel;
             GenerateMapCommand = new RelayCommand(OnGenerateMap);
-            ShowPathCommand = new RelayCommand(OnShowPath, () => PathFound);
+            LoadMapFromFileCommand = new RelayCommand(OnLoadMapFromFile);
             GenerateMapWidth = 20;
             GenerateMapHeight = 20;
+            GenerateMapPercentSinkholes = 15;
         }
 
         public IMazeControlViewModel MazeControlViewModel { get; private set; }
 
+        public ICommand GenerateMapCommand { get; private set; }
+        public ICommand ShowPathCommand { get; private set; }
+        public ICommand LoadMapFromFileCommand { get; private set; }
 
         public bool PathFound
         {
@@ -37,6 +43,23 @@ namespace OgreMaze.UI.ViewModels
             private set
             {
                 _pathFound = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ShowPath
+        {
+            get { return _showPath; }
+            set
+            {
+                _showPath = value;
+                if (value && MazeControlViewModel.SwampTilesWithPath == null)
+                {
+                    _swampNavigator.DrawPath();
+                    MazeControlViewModel.SwampTilesWithPath = (SwampTile[,])_mapService.Map.Clone();
+                }
+
+                MazeControlViewModel.ShowPath = value;
                 OnPropertyChanged();
             }
         }
@@ -61,23 +84,41 @@ namespace OgreMaze.UI.ViewModels
             }
         }
 
-        public ICommand GenerateMapCommand { get; private set; }
-        public ICommand ShowPathCommand { get; private set; }
+        public int GenerateMapPercentSinkholes
+        {
+            get { return _generateMapPercentSinkholes; }
+            set
+            {
+                _generateMapPercentSinkholes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string MapFilePath { get; set; }
+
 
         private void OnGenerateMap()
         {
-            PathFound = _swampNavigator.GenerateMapAndNavigate(GenerateMapWidth, GenerateMapHeight);
-            MazeControlViewModel.SwampTiles = (SwampTile[,])_mapService.Map.Clone();
-            MazeControlViewModel.ShowPath = false;
+            PathFound = _swampNavigator.GenerateMapAndNavigate(GenerateMapWidth, GenerateMapHeight, GenerateMapPercentSinkholes);
+            UpdateMazeControlViewModel();
         }
 
-        private void OnShowPath()
+        private void OnLoadMapFromFile()
         {
-            _swampNavigator.DrawPath();
-            MazeControlViewModel.SwampTilesWithPath = (SwampTile[,])_mapService.Map.Clone();
-            MazeControlViewModel.ShowPath = true;
+            PathFound = _swampNavigator.NavigateMap(MapFilePath);
+            UpdateMazeControlViewModel();
         }
 
+        private void UpdateMazeControlViewModel()
+        {
+            ShowPath = false;
+            MazeControlViewModel.SwampTiles = (SwampTile[,])_mapService.Map.Clone();
+            MazeControlViewModel.SwampTilesWithPath = null;
+            MazeControlViewModel.ShowPath = false;
+            MazeControlViewModel.MazeWidth = _mapService.Width + 1;
+            MazeControlViewModel.MazeHeight = _mapService.Height + 1;
+        }
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

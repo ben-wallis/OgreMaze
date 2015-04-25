@@ -9,5 +9,7 @@ namespace OgreMaze.UI.ViewModels
         SwampTile[,] SwampTiles { get; set; }
         SwampTile[,] SwampTilesWithPath { get; set; }
         bool ShowPath { get; set; }
+        int MazeWidth { get; set; }
+        int MazeHeight { get; set; }
     }
 }

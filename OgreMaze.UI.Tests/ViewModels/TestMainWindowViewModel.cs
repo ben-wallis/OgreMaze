@@ -26,7 +26,7 @@ namespace OgreMaze.UI.Tests.ViewModels
             _testUtility.TestViewModel.GenerateMapCommand.Execute(null);
 
             // Assert
-            _testUtility.MockSwampNavigator.Verify(s => s.GenerateMapAndNavigate(_testUtility.TestMapWidth, _testUtility.TestMapHeight));
+            _testUtility.MockSwampNavigator.Verify(s => s.GenerateMapAndNavigate(_testUtility.TestMapWidth, _testUtility.TestMapHeight, _testUtility.TestSinkholesPerHundred));
             _testUtility.MockMazeControlViewModel.Verify();
         }
 
@@ -50,6 +50,7 @@ namespace OgreMaze.UI.Tests.ViewModels
                 // Test data setup
                 TestMapWidth = 5;
                 TestMapHeight = 10;
+                TestSinkholesPerHundred = 15;
                 TestMap = new SwampTile[TestMapWidth, TestMapHeight];
 
                 // Mock setups
@@ -57,7 +58,7 @@ namespace OgreMaze.UI.Tests.ViewModels
                 MockSwampNavigator = new Mock<ISwampNavigator>();
                 MockMazeControlViewModel = new Mock<IMazeControlViewModel>();
 
-                MockSwampNavigator.Setup(s => s.GenerateMapAndNavigate(TestMapWidth, TestMapHeight)).Verifiable();
+                MockSwampNavigator.Setup(s => s.GenerateMapAndNavigate(TestMapWidth, TestMapHeight, TestSinkholesPerHundred)).Verifiable();
                 MockMapService.SetupGet(m => m.Map).Returns(TestMap).Verifiable();
                 MockMazeControlViewModel.SetupSet(v => v.SwampTiles = TestMap).Verifiable();
 
@@ -73,6 +74,7 @@ namespace OgreMaze.UI.Tests.ViewModels
             public MainWindowViewModel TestViewModel { get; private set; }
             public int TestMapHeight { get; set; }
             public int TestMapWidth { get; set; }
+            public int TestSinkholesPerHundred { get; set; }
 
             public SwampTile[,] TestMap;
         }

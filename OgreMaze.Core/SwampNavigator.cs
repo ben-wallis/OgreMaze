@@ -24,16 +24,16 @@ namespace OgreMaze.Core
             _tileService = tileService;
         }
 
-        public bool GenerateMapAndNavigate(int width, int height)
+        public bool GenerateMapAndNavigate(int width, int height, int sinkholesPerHundred)
         {
-            _mapService.GenerateAndLoadMap(width, height);
+            _mapService.GenerateAndLoadMap(width, height, sinkholesPerHundred);
             return NavigateMap();
         }
 
-        public void NavigateMap(string mapFile)
+        public bool NavigateMap(string mapFile)
         {
             _mapService.LoadMapFromFile(mapFile);
-            NavigateMap();
+            return NavigateMap();
         }
 
         public bool NavigateMap()

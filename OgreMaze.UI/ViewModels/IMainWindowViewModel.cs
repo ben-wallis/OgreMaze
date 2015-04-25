@@ -9,8 +9,9 @@ namespace OgreMaze.UI.ViewModels
         int GenerateMapHeight { get; set; }
         int GenerateMapWidth { get; set; }
         bool PathFound { get; }
+        bool ShowPath { get; }
         ICommand GenerateMapCommand { get; }
-        ICommand ShowPathCommand { get; }
+        ICommand LoadMapFromFileCommand { get; }
         event PropertyChangedEventHandler PropertyChanged;
     }
 }

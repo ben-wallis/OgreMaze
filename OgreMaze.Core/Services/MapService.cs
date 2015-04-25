@@ -23,9 +23,9 @@ namespace OgreMaze.Core.Services
         public int Width { get; private set; }
         public int Height { get; private set; }
 
-        public void GenerateAndLoadMap(int width, int height)
+        public void GenerateAndLoadMap(int width, int height, int percentSinkholes)
         {
-            Map = _mapGenerationService.GenerateMap(width, height);
+            Map = _mapGenerationService.GenerateMap(width, height, percentSinkholes);
             Width = width - 1;
             Height = height - 1;
             Console.WriteLine("Generated new map:");
@@ -37,6 +37,7 @@ namespace OgreMaze.Core.Services
         public void LoadMapFromFile(string mapFilePath)
         {
             var mapContents = _fileSystemService.ReadFileAsIEnumerable(mapFilePath).ToList();
+            Map = null;
 
             var currentLine = 0;
             foreach (var line in mapContents)

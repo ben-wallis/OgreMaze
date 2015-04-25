@@ -3,24 +3,63 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:views="clr-namespace:OgreMaze.UI.Views"
         xmlns:viewModels="clr-namespace:OgreMaze.UI.ViewModels"
+        xmlns:converters="clr-namespace:OgreMaze.UI.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Ogre Gold Finding Service" Height="600" Width="660">
+    <Window.Resources>
+        <converters:BooleanToShrekConverter x:Key="BooleanToShrekConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="200"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <views:MazeControlView DataContext="{Binding MazeControlViewModel}" Grid.Column="0" Grid.Row="0" />
-        <WrapPanel Grid.Column="0" Grid.Row="1">
-            <Button Command="{Binding GenerateMapCommand}">Generate Map</Button>
-            <Button Command="{Binding ShowPathCommand}">Show Path</Button>
-            <TextBlock>Path Found: </TextBlock><TextBlock Text="{Binding PathFound}" />
-        </WrapPanel>
+        <StackPanel Grid.Column="1" Grid.Row="0" Margin="5,5,5,5" HorizontalAlignment="Left" >
+            <GroupBox Header="Map Generation" Margin="5,5,5,5">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                        <TextBlock>Width:</TextBlock>
+                        <xctk:IntegerUpDown Value="{Binding GenerateMapWidth}" Margin="5,0,0,0" />
+                        <TextBlock Margin="5,0,0,0">Height:</TextBlock>
+                        <xctk:IntegerUpDown Value="{Binding GenerateMapHeight}" Margin="5,0,0,0" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock> Percent Sinkholes: </TextBlock>
+                        <xctk:IntegerUpDown Value="{Binding GenerateMapPercentSinkholes}" Margin="5,0,0,0" Minimum="0" Maximum="90"/>
+                    </StackPanel>
+                    <Button Command="{Binding GenerateMapCommand}" Height="40" Margin="0,5,0,0">Generate Map</Button>
+                 </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Load Map From File" Margin="5,5,5,5">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,5" >
+                    <Button  Click="btnOpenFile_Click">Select Map File</Button>
+                    <Button  Margin="5,0,0,0" Command="{Binding LoadMapFromFileCommand}">Load Map</Button>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center">File Path:</TextBlock>
+                        <TextBlock Name="txtFilePath" Margin="5,0,0,0" Text="{Binding MapFilePath, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Path Information" Width="175" Margin="5,5,5,5">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock >Path Found:</TextBlock>
+                        <TextBlock Text="{Binding PathFound}" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <CheckBox IsChecked="{Binding ShowPath}" IsEnabled="{Binding PathFound}">Show Path</CheckBox>
+                    <Image Source="{Binding PathFound, Converter={StaticResource BooleanToShrekConverter}}" RenderOptions.BitmapScalingMode="HighQuality" />
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
     </Grid>
 </Window>

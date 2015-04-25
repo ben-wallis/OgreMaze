@@ -10,6 +10,8 @@ namespace OgreMaze.UI.ViewModels
         private SwampTile[,] _swampTiles;
         private SwampTile[,] _swampTilesWithPath;
         private bool _showPath;
+        private int _mazeWidth;
+        private int _mazeHeight;
 
         public MazeControlViewModel()
         {
@@ -34,6 +36,26 @@ namespace OgreMaze.UI.ViewModels
             set
             {
                 _swampTilesWithPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int MazeWidth
+        {
+            get { return _mazeWidth; }
+            set
+            {
+                _mazeWidth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int MazeHeight
+        {
+            get { return _mazeHeight; }
+            set
+            {
+                _mazeHeight = value;
                 OnPropertyChanged();
             }
         }

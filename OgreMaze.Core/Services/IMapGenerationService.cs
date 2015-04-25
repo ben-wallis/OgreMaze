@@ -2,6 +2,6 @@
 {
     internal interface IMapGenerationService
     {
-        SwampTile[,] GenerateMap(int width, int height);
+        SwampTile[,] GenerateMap(int width, int height, int sinkholesPerHundred);
     }
 }

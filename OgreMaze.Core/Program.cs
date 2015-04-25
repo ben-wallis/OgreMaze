@@ -16,7 +16,7 @@ namespace OgreMaze.Core
             var swampNavigator = container.Resolve<ISwampNavigator>();
 
             //swampNavigator.NavigateMap("C:\\ChallengeInput1.txt");
-            var success = swampNavigator.GenerateMapAndNavigate(100, 60);
+            var success = swampNavigator.GenerateMapAndNavigate(100, 60, 15);
             if (success)
             {
                 
